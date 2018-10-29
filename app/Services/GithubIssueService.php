@@ -55,7 +55,7 @@ class GithubIssueService
             $body
         );
 
-        //$this->notifySlack($githubIssue, $channel);
+        $this->notifySlack($githubIssue, $channel);
 
         return $githubIssue;
     }
