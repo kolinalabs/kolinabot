@@ -80,7 +80,7 @@ class GithubIssueService
             $issueBody .= "\n$name: $message\n";
         }
 
-        return $issueBody;
+        return $this->stripNonUTF($issueBody);
     }
 
     /**
@@ -89,13 +89,13 @@ class GithubIssueService
      */
     private function formatIssueTitle($message)
     {
-        $issueTitle = $message['text'];
-
+        $issueTitle = $this->stripNonUTF($message['text']);
+        
         if (strlen($issueTitle) > self::ISSUE_TITLE_LENGTH) {
             return substr($issueTitle, 0, self::ISSUE_TITLE_LENGTH) . "...";
         }
 
-        return $issueTitle;
+        return $this->stripNonUTF($issueTitle);
     }
 
     /**
@@ -118,7 +118,7 @@ class GithubIssueService
      */
     private function notifySlack(\GitHubIssue $gitHubIssue, $channel)
     {
-        if (!$gitHubIssue) {
+        if (! $gitHubIssue) {
             return;
         }
 
@@ -128,5 +128,21 @@ class GithubIssueService
         $message = "Issue #$issueNumber criada: $issueUrl";
 
         $this->slackApiService->postMessage($channelName, $message);
+    }
+
+    /**
+     * @param $string
+     * @return string
+     */
+    private function stripNonUTF($string){
+        $sanitizedString = preg_replace("/\<([^<>]*+|(?R))*\>/","", $string);
+
+        $sanitizedString = str_replace('&amp;', '&', $sanitizedString);
+
+        $sanitizedString = str_replace('&lt;', '<', $sanitizedString);
+
+        $sanitizedString = str_replace('&gt;', '>', $sanitizedString);
+
+        return trim($sanitizedString);
     }
 }

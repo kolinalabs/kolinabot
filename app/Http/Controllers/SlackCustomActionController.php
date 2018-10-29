@@ -41,21 +41,9 @@ class SlackCustomActionController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $this->validate($request, [
-            'token' => 'required',
-            'callback_id' => 'required',
-            'type' => 'required',
-            'response_url' => 'required',
-            'team' => 'required',
-            'user' => 'required',
-            'channel' => 'required',
-            'message' => 'required'
-        ]);
-
         $channel = $request->get('channel');
         $message = $request->get('message');
         $action = $request->get('callback_id');
-
 
         switch ($action) {
             case "create_issue":
