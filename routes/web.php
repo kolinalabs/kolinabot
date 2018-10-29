@@ -16,5 +16,3 @@ $router->group(['prefix' => 'bot'], function () use ($router) {
         $router->post('action', 'SlackCustomActionController');
     });
 });
-
-
