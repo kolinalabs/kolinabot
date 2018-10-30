@@ -11,10 +11,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\GithubIssueService;
+use App\Jobs\CreateIssueJob;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 /**
  * SlackCustomActionController
@@ -23,18 +22,6 @@ use Illuminate\Http\Response;
  */
 class SlackCustomActionController extends Controller
 {
-    /** @var GithubIssueService */
-    private $githubIssueService;
-
-    /**
-     * CreateIssueController constructor.
-     * @param GithubIssueService $githubIssueService
-     */
-    public function __construct(GithubIssueService $githubIssueService)
-    {
-        $this->githubIssueService = $githubIssueService;
-    }
-
     /**
      * @param Request $request
      * @return JsonResponse
@@ -53,16 +40,10 @@ class SlackCustomActionController extends Controller
 
         switch ($action) {
             case "create_issue":
-                $githubIssue = $this->githubIssueService->createIssue($channel, $message);
-
-                if ($githubIssue) {
-                    return JsonResponse::create((array) $githubIssue);
-                }
+                dispatch(new CreateIssueJob($channel, $message));
                 break;
         }
 
-        return JsonResponse::create([
-            'message' => 'Undefined action'
-        ], Response::HTTP_NOT_FOUND);
+        return JsonResponse::create();
     }
 }
