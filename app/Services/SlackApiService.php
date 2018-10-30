@@ -25,7 +25,7 @@ class SlackApiService
 
     public function __construct()
     {
-        $token = env('SLACK_API_TOKEN');
+        $token = env("SLACK_API_TOKEN");
 
         $this->slack = new slack($token);
     }
@@ -46,9 +46,9 @@ class SlackApiService
     public function getMessageReplies($channelId, $ts)
     {
         return $this->slack->conversations->replies([
-            'channel' => $channelId,
-            'ts' => $ts,
-            'limit' => PHP_INT_MAX / 2
+            "channel" => $channelId,
+            "ts" => $ts,
+            "limit" => PHP_INT_MAX / 2
         ]);
     }
 
@@ -59,26 +59,35 @@ class SlackApiService
     public function getUserInfo($userId)
     {
         return $this->slack->users->info([
-            'user' => $userId
+            "user" => $userId
         ]);
     }
 
     /**
      * @param $channel
-     * @param $message
+     * @param $notification
+     * @param null $threadTs
      * @return mixed
      */
-    public function postMessage($channel, $message)
+    public function postMessage($channel, $notification, $threadTs = null)
     {
-        return $this->slack->chat->postMessage([
+        $params = [
             "channel" => $channel,
-            "text" => $message,
+            "text" => $notification,
             "username" => "kolinabot",
             "as_user" => false,
             "parse" => "full",
             "link_names" => 1,
             "unfurl_links" => true,
-            "unfurl_media" => false
-        ]);
+            "unfurl_media" => false,
+        ];
+
+        if ($threadTs) {
+            $params["thread_ts"] = $threadTs;
+        }
+
+        return $this->slack->chat->postMessage($params);
     }
+
+
 }

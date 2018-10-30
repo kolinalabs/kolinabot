@@ -55,7 +55,7 @@ class GithubIssueService
             $body
         );
 
-        $this->notifySlack($githubIssue, $channel);
+        $this->notifySlack($githubIssue, $channel, $message);
 
         return $githubIssue;
     }
@@ -69,13 +69,13 @@ class GithubIssueService
     {
         $issueBody = "";
 
-        $replies = $this->slackApiService->getMessageReplies($channel['id'], $message['ts']);
+        $replies = $this->slackApiService->getMessageReplies($channel["id"], $message["ts"]);
 
-        foreach ($replies['messages'] as $reply) {
-            $userInfo = $this->slackApiService->getUserInfo($reply['user']);
+        foreach ($replies["messages"] as $reply) {
+            $userInfo = $this->slackApiService->getUserInfo($reply["user"]);
 
-            $name = $userInfo['user']['real_name'];
-            $message = $reply['text'];
+            $name = $userInfo["user"]["real_name"];
+            $message = $reply["text"];
 
             $issueBody .= "\n$name: $message\n";
         }
@@ -89,7 +89,7 @@ class GithubIssueService
      */
     private function formatIssueTitle($message)
     {
-        $issueTitle = $this->stripNonUTF($message['text']);
+        $issueTitle = $this->stripNonUTF($message["text"]);
 
         if (strlen($issueTitle) > self::ISSUE_TITLE_LENGTH) {
             return substr($issueTitle, 0, self::ISSUE_TITLE_LENGTH) . "...";
@@ -105,7 +105,7 @@ class GithubIssueService
     private function findRepositoryByChannel($channel)
     {
         $matches = [];
-        preg_match("/sices-report-(.*)/", $channel['name'], $matches);
+        preg_match("/sices-report-(.*)/", $channel["name"], $matches);
 
         $repository = $matches[1] ?? null;
 
@@ -114,20 +114,18 @@ class GithubIssueService
 
     /**
      * @param \GitHubIssue $gitHubIssue
-     * @param $channel
+     * @param array $channel
+     * @param array $message
      */
-    private function notifySlack(\GitHubIssue $gitHubIssue, $channel)
+    private function notifySlack(\GitHubIssue $gitHubIssue, array $channel, array $message)
     {
-        if (! $gitHubIssue) {
-            return;
-        }
-
         $issueNumber = $gitHubIssue->getNumber();
         $issueUrl = $gitHubIssue->getHtmlUrl();
-        $channelName = $channel['name'];
-        $message = "Issue #$issueNumber criada: $issueUrl";
+        $channelName = $channel["name"];
+        $notification = "Issue #$issueNumber criada: $issueUrl";
+        $threadTs = $message["thread_ts"];
 
-        $this->slackApiService->postMessage($channelName, $message);
+        $this->slackApiService->postMessage($channelName, $notification, $threadTs);
     }
 
     /**
@@ -137,11 +135,11 @@ class GithubIssueService
     private function stripNonUTF($string){
         $sanitizedString = preg_replace("/\<([^<>]*+|(?R))*\>/","", $string);
 
-        $sanitizedString = str_replace('&amp;', '&', $sanitizedString);
+        $sanitizedString = str_replace("&amp;", "&", $sanitizedString);
 
-        $sanitizedString = str_replace('&lt;', '<', $sanitizedString);
+        $sanitizedString = str_replace("&lt;", "<", $sanitizedString);
 
-        $sanitizedString = str_replace('&gt;', '>', $sanitizedString);
+        $sanitizedString = str_replace("&gt;", ">", $sanitizedString);
 
         return trim($sanitizedString);
     }
