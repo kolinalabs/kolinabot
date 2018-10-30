@@ -69,7 +69,9 @@ class GithubIssueService
     {
         $issueBody = "";
 
-        $replies = $this->slackApiService->getMessageReplies($channel["id"], $message["ts"]);
+        $replyCount = intval($message['reply_count']);
+
+        $replies = $this->slackApiService->getMessageReplies($channel["id"], $message["ts"], $replyCount);
 
         foreach ($replies["messages"] as $reply) {
             $userInfo = $this->slackApiService->getUserInfo($reply["user"]);
@@ -78,6 +80,25 @@ class GithubIssueService
             $message = $reply["text"];
 
             $issueBody .= "\n$name: $message\n";
+
+            $files = "";
+            if (isset($reply['files'])) {
+                foreach ($reply['files'] as $file) {
+                    $mimetype = $file['mimetype'];
+
+                    if (str_contains($mimetype, 'image')) {
+                        $image = $file['url_private'];
+                        $files .= "- $image";
+                    } else {
+                        $downloadLink = $file['url_private_download'];
+                        $files .= "- $downloadLink";
+                    }
+
+                    $files .= "\n";
+                }
+            }
+
+            $issueBody .= $files;
         }
 
         return $this->stripNonUTF($issueBody);
