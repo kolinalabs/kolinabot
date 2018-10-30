@@ -90,7 +90,7 @@ class GithubIssueService
     private function formatIssueTitle($message)
     {
         $issueTitle = $this->stripNonUTF($message['text']);
-        
+
         if (strlen($issueTitle) > self::ISSUE_TITLE_LENGTH) {
             return substr($issueTitle, 0, self::ISSUE_TITLE_LENGTH) . "...";
         }
