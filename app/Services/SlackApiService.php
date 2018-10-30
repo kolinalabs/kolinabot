@@ -43,12 +43,12 @@ class SlackApiService
      * @param $ts
      * @return mixed
      */
-    public function getMessageReplies($channelId, $ts)
+    public function getMessageReplies($channelId, $ts, $limit = 10)
     {
         return $this->slack->conversations->replies([
             "channel" => $channelId,
             "ts" => $ts,
-            "limit" => PHP_INT_MAX / 2
+            "limit" => $limit
         ]);
     }
 
