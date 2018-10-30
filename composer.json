@@ -9,7 +9,8 @@
         "laravel/lumen-framework": "5.5.*",
         "vlucas/phpdotenv": "~2.2",
         "wrapi/slack": "^1.0",
-        "tan-tan-kanarek/github-php-client": "^1.0"
+        "tan-tan-kanarek/github-php-client": "^1.0",
+        "illuminate/redis": "^5.5"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
