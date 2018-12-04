@@ -41,6 +41,7 @@ class SlackApiService
     /**
      * @param $channelId
      * @param $ts
+     * @param int $limit
      * @return mixed
      */
     public function getMessageReplies($channelId, $ts, $limit = 10)
@@ -88,6 +89,5 @@ class SlackApiService
 
         return $this->slack->chat->postMessage($params);
     }
-
 
 }
