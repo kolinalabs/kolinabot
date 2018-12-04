@@ -14,6 +14,7 @@ namespace App\Http\Controllers;
 use App\Jobs\CreateIssueJob;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /**
  * SlackCustomActionController
@@ -41,7 +42,10 @@ class SlackCustomActionController extends Controller
         switch ($action) {
             case "create_issue":
                 dispatch(new CreateIssueJob($channel, $message));
+
                 break;
+            default:
+                return JsonResponse::create([], Response::HTTP_NOT_FOUND);
         }
 
         return JsonResponse::create();
